@@ -57,6 +57,34 @@ encode(instruction(dec, Operand), MachineInstruction) :-
     MachineInstruction = machine_instruction(opcode(5, RegisterIndex, 0)),
     register(Operand, RegisterIndex).
 
+
+% NOTE(mcsalgado): assorted operations on accumulator/flags
+
+encode(instruction(rlca), MachineInstruction) :-
+    MachineInstruction = machine_instruction(opcode(7, 0, 0)).
+
+encode(instruction(rrca), MachineInstruction) :-
+    MachineInstruction = machine_instruction(opcode(7, 1, 0)).
+
+encode(instruction(rla), MachineInstruction) :-
+    MachineInstruction = machine_instruction(opcode(7, 2, 0)).
+
+encode(instruction(rra), MachineInstruction) :-
+    MachineInstruction = machine_instruction(opcode(7, 3, 0)).
+
+encode(instruction(daa), MachineInstruction) :-
+    MachineInstruction = machine_instruction(opcode(7, 4, 0)).
+
+encode(instruction(cpl), MachineInstruction) :-
+    MachineInstruction = machine_instruction(opcode(7, 5, 0)).
+
+encode(instruction(scf), MachineInstruction) :-
+    MachineInstruction = machine_instruction(opcode(7, 6, 0)).
+
+encode(instruction(ccf), MachineInstruction) :-
+    MachineInstruction = machine_instruction(opcode(7, 7, 0)).
+
+
 encode(instruction(halt), MachineInstruction) :-
     MachineInstruction = machine_instruction(opcode(6, 6, 1)).
 
@@ -71,6 +99,7 @@ encode(instruction(ld, Operand, N), MachineInstruction) :-
     register(Operand, RegisterIndex),
     ImmediateData = N.
 
+% NOTE(mcsalgado): conditional return
 encode(instruction(ret, Operand), MachineInstruction) :-
     MachineInstruction = opcode(0, ConditionIndex, 3),
     condition(Operand, ConditionIndex).
@@ -81,6 +110,9 @@ encode(instruction(pop, Operand), MachineInstruction) :-
 
 encode(instruction(di), MachineInstruction) :-
     MachineInstruction = machine_instruction(opcode(3, 6, 3)).
+
+encode(instruction(ei), MachineInstruction) :-
+    MachineInstruction = machine_instruction(opcode(3, 7, 3)).
 
 encode(instruction(push, Operand), MachineInstruction) :-
     MachineInstruction = opcode(5, 0, RegisterPair2Index, 3),
