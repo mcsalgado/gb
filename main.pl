@@ -99,6 +99,40 @@ encode(instruction(ld, Operand, N), MachineInstruction) :-
     register(Operand, RegisterIndex),
     ImmediateData = N.
 
+% NOTE(mcsalgado): operate on accumulator and register/memory location
+encode(instruction(add, a, Operand), MachineInstruction) :-
+    MachineInstruction = machine_instruction(opcode(RegisterIndex, 0, 2)),
+    register(Operand, RegisterIndex).
+
+encode(instruction(adc, a, Operand), MachineInstruction) :-
+    MachineInstruction = machine_instruction(opcode(RegisterIndex, 1, 2)),
+    register(Operand, RegisterIndex).
+
+encode(instruction(sub, Operand), MachineInstruction) :-
+    MachineInstruction = machine_instruction(opcode(RegisterIndex, 2, 2)),
+    register(Operand, RegisterIndex).
+
+encode(instruction(sbc, a, Operand), MachineInstruction) :-
+    MachineInstruction = machine_instruction(opcode(RegisterIndex, 3, 2)),
+    register(Operand, RegisterIndex).
+
+encode(instruction(and, Operand), MachineInstruction) :-
+    MachineInstruction = machine_instruction(opcode(RegisterIndex, 4, 2)),
+    register(Operand, RegisterIndex).
+
+encode(instruction(xor, Operand), MachineInstruction) :-
+    MachineInstruction = machine_instruction(opcode(RegisterIndex, 5, 2)),
+    register(Operand, RegisterIndex).
+
+encode(instruction(or, Operand), MachineInstruction) :-
+    MachineInstruction = machine_instruction(opcode(RegisterIndex, 6, 2)),
+    register(Operand, RegisterIndex).
+
+encode(instruction(cp, Operand), MachineInstruction) :-
+    MachineInstruction = machine_instruction(opcode(RegisterIndex, 7, 2)),
+    register(Operand, RegisterIndex).
+
+
 % NOTE(mcsalgado): conditional return
 encode(instruction(ret, Operand), MachineInstruction) :-
     MachineInstruction = opcode(0, ConditionIndex, 3),
