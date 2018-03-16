@@ -101,9 +101,10 @@ encode(instruction(scf), MachineInstruction) :-
 encode(instruction(ccf), MachineInstruction) :-
     MachineInstruction = machine_instruction(opcode(7, 7, 0)).
 
-
+% NOTE(mcsalgado): exception, replaces "ld (hl), (hl)"
 encode(instruction(halt), MachineInstruction) :-
-    MachineInstruction = machine_instruction(opcode(6, 6, 1)).
+    MachineInstruction = machine_instruction(opcode(6, 6, 1)),
+    !.
 
 encode(instruction(ld, Dest, Src), MachineInstruction) :-
     MachineInstruction = machine_instruction(opcode(SrcRegisterIndex, DestRegisterIndex, 1)),
