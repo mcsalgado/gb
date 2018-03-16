@@ -206,6 +206,18 @@ encode(instruction(rst, Operand), MachineInstruction) :-
     MachineInstruction = machine_instruction(opcode(7, Y, 3)),
     Operand #= Y*8.
 
+encode(instruction(bit, N, Operand), MachineInstruction) :-
+    MachineInstruction = machine_instruction(cb_prefix, opcode(RegisterIndex, N, 1)),
+    register(Operand, RegisterIndex).
+
+encode(instruction(res, N, Operand), MachineInstruction) :-
+    MachineInstruction = machine_instruction(cb_prefix, opcode(RegisterIndex, N, 2)),
+    register(Operand, RegisterIndex).
+
+encode(instruction(set, N, Operand), MachineInstruction) :-
+    MachineInstruction = machine_instruction(cb_prefix, opcode(RegisterIndex, N, 3)),
+    register(Operand, RegisterIndex).
+
 encode_list([], []).
 encode_list([H | T], [H1 | T1]) :-
     encode(H, H1),
@@ -234,12 +246,20 @@ assemble_displacement(machine_instruction(Opcode, DisplacementByte), Assembled) 
     assemble(machine_instruction(Opcode), X),
     Assembled = [X, N].
 
+assemble_cb_prefix(machine_instruction(cb_prefix, Opcode), Assembled) :-
+    X in 0..255,
+    assemble(machine_instruction(Opcode), X),
+    Assembled = [0xCB, X].
+
 assemble_list([], []).
 assemble_list([H | T], [H11, H12 | T1]) :-
     assemble_immediate8(H, [H11, H12]),
     assemble_list(T, T1).
 assemble_list([H | T], [H11, H12 | T1]) :-
     assemble_displacement(H, [H11, H12]),
+    assemble_list(T, T1).
+assemble_list([H | T], [H11, H12 | T1]) :-
+    assemble_cb_prefix(H, [H11, H12]),
     assemble_list(T, T1).
 assemble_list([H | T], [H1 | T1]) :-
     assemble(H, H1),
