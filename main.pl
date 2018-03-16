@@ -50,6 +50,9 @@ immediate_data16(Nn) :-
 encode(instruction(nop), MachineInstruction) :-
     MachineInstruction = machine_instruction(opcode(0, 0, 0)).
 
+encode(instruction(stop), MachineInstruction) :-
+    MachineInstruction = machine_instruction(opcode(0, 2, 0), immediate_data8(0)).
+
 encode(instruction(jr, D), MachineInstruction) :-
     MachineInstruction = machine_instruction(opcode(0, 3, 0), displacement_byte(D)).
 
@@ -154,9 +157,25 @@ encode(instruction(ret, Operand), MachineInstruction) :-
     MachineInstruction = opcode(0, ConditionIndex, 3),
     condition(Operand, ConditionIndex).
 
+
+% NOTE(mcsalgado): pop and various ops
+
 encode(instruction(pop, Operand), MachineInstruction) :-
     MachineInstruction = opcode(1, 0, RegisterPair2Index, 3),
     register_pair2(Operand, RegisterPair2Index).
+
+encode(instruction(ret), MachineInstruction) :-
+    MachineInstruction = machine_instruction(opcode(1, 1, 0, 3)).
+
+encode(instruction(reti), MachineInstruction) :-
+    MachineInstruction = machine_instruction(opcode(1, 1, 1, 3)).
+
+encode(instruction(jp, p_hl_p), MachineInstruction) :-
+    MachineInstruction = machine_instruction(opcode(1, 1, 2, 3)).
+
+encode(instruction(ld, sp, hl), MachineInstruction) :-
+    MachineInstruction = machine_instruction(opcode(1, 1, 3, 3)).
+
 
 encode(instruction(di), MachineInstruction) :-
     MachineInstruction = machine_instruction(opcode(3, 6, 3)).
