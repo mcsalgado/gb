@@ -61,6 +61,21 @@ encode(instruction(jr, D), MachineInstruction) :-
      condition(Operand, ConditionIndex).
 
 
+% NOTE(mcsalgado): indirect loading
+
+encode(instruction(ld, p_bc_p, a), MachineInstruction) :-
+    MachineInstruction = machine_instruction(opcode(2, 0, 0, 0)).
+
+encode(instruction(ld, p_de_p, a), MachineInstruction) :-
+    MachineInstruction = machine_instruction(opcode(2, 0, 1, 0)).
+
+encode(instruction(ld, a, p_bc_p), MachineInstruction) :-
+    MachineInstruction = machine_instruction(opcode(2, 1, 0, 0)).
+
+encode(instruction(ld, a, p_de_p), MachineInstruction) :-
+    MachineInstruction = machine_instruction(opcode(2, 1, 1, 0)).
+
+
 encode(instruction(inc, Operand), MachineInstruction) :-
     MachineInstruction = machine_instruction(opcode(3, 0, RegisterPairIndex, 0)),
     register_pair(Operand, RegisterPairIndex).
