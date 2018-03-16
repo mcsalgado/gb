@@ -199,11 +199,11 @@ encode(instruction(ei), MachineInstruction) :-
     MachineInstruction = machine_instruction(opcode(3, 7, 3)).
 
 encode(instruction(push, Operand), MachineInstruction) :-
-    MachineInstruction = opcode(5, 0, RegisterPair2Index, 3),
+    MachineInstruction = machine_instruction(opcode(5, 0, RegisterPair2Index, 3)),
     register_pair2(Operand, RegisterPair2Index).
 
 encode(instruction(rst, Operand), MachineInstruction) :-
-    MachineInstruction = opcode(7, Y, 3),
+    MachineInstruction = machine_instruction(opcode(7, Y, 3)),
     Operand #= Y*8.
 
 encode_list([], []).
