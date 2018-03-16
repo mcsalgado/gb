@@ -38,8 +38,25 @@ condition(nc, 2).
 condition(c, 3).
 
 
+displacement_byte(D) :-
+    D in -128..127.
+immediate_data8(N) :-
+    N in 0..255.
+immediate_data16(Nn) :-
+    Nn in 0..65535.
+
+% NOTE(mcsalgado): relative jumps and assorted ops
+
 encode(instruction(nop), MachineInstruction) :-
     MachineInstruction = machine_instruction(opcode(0, 0, 0)).
+
+encode(instruction(jr, D), MachineInstruction) :-
+    MachineInstruction = machine_instruction(opcode(0, 3, 0), displacement_byte(D)).
+
+ encode(instruction(jr, Operand, D), MachineInstruction) :-
+     MachineInstruction = machine_instruction(opcode(0, ConditionIndex+4, 0), displacement_byte(D)),
+     condition(Operand, ConditionIndex).
+
 
 encode(instruction(inc, Operand), MachineInstruction) :-
     MachineInstruction = machine_instruction(opcode(3, 0, RegisterPairIndex, 0)),
@@ -94,10 +111,8 @@ encode(instruction(ld, Dest, Src), MachineInstruction) :-
     register(Src, SrcRegisterIndex).
 
 encode(instruction(ld, Operand, N), MachineInstruction) :-
-    N in 0..255,
-    MachineInstruction = machine_instruction(opcode(6, RegisterIndex, 0), ImmediateData),
-    register(Operand, RegisterIndex),
-    ImmediateData = N.
+    MachineInstruction = machine_instruction(opcode(6, RegisterIndex, 0), immediate_data8(N)),
+    register(Operand, RegisterIndex).
 
 % NOTE(mcsalgado): operate on accumulator and register/memory location
 encode(instruction(add, a, Operand), MachineInstruction) :-
@@ -171,15 +186,25 @@ assemble(machine_instruction(opcode(Z, Y, X)), Assembled) :-
     Assembled in 0..255,
     Assembled #= (Z + (Y * 8) + (X * 64)).
 
-assemble_immediate(machine_instruction(Opcode, ImmediateData), Assembled) :-
+assemble_immediate8(machine_instruction(Opcode, ImmediateData), Assembled) :-
     X in 0..255,
-    ImmediateData in 0..255,
+    ImmediateData = immediate_data8(N),
     assemble(machine_instruction(Opcode), X),
-    Assembled = [X, ImmediateData].
+    Assembled = [X, N].
+
+assemble_displacement(machine_instruction(Opcode, DisplacementByte), Assembled) :-
+    X in 0..255,
+    DisplacementByte = displacement_byte(D),
+    N #= D + 127,
+    assemble(machine_instruction(Opcode), X),
+    Assembled = [X, N].
 
 assemble_list([], []).
 assemble_list([H | T], [H11, H12 | T1]) :-
-    assemble_immediate(H, [H11, H12]),
+    assemble_immediate8(H, [H11, H12]),
+    assemble_list(T, T1).
+assemble_list([H | T], [H11, H12 | T1]) :-
+    assemble_displacement(H, [H11, H12]),
     assemble_list(T, T1).
 assemble_list([H | T], [H1 | T1]) :-
     assemble(H, H1),
